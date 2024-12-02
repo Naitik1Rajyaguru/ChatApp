@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Chat</title>
+  </head>
+  <body>
+    <h1>Socket.IO CChat</h1>
+    <div>
+      <input type="text" name="" id="clientName" placeholder="Enter your ID" />
+      <button id="nameSubmitButton">Set ID</button>
+    </div>
+    <div>
+      <input
+        type="text"
+        name=""
+        id="messageInput"
+        placeholder="Enter your msg in {id}: {msg} format"
+        disabled
+      />
+      <button id="sendButton">Send</button>
+    </div>
+    <div id="chatWindow"></div>
+    <!-- Load the Socket.IO client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      let clientID = document.getElementById("clientName").value.trim();
+
+      document
+        .getElementById("nameSubmitButton")
+        .addEventListener("click", () => {
+          clientID = document.getElementById("clientName").value.trim();
+          if (clientID) {
+            socket.emit("setName", clientID);
+            document.getElementById("messageInput").disabled = false;
+            document.getElementById("sendButton").disabled = false;
+            document.getElementById("clientName").disabled = true;
+            document.getElementById("nameSubmitButton").disabled = true;
+            console.log(`Name set to: ${clientID}`);
+          }
+        });
+
+      document.getElementById("sendButton").addEventListener("click", () => {
+        const receiver = prompt("enter receiver id");
+        const message = document.getElementById("messageInput").value.trim();
+        if (receiver && message) {
+          const messageToSent = `${clientID}: ${message}`;
+          socket.emit("ChatMessage", {
+            receiver: receiver,
+            msg: messageToSent,
+          });
+          document.getElementById("messageInput").value = "";
+        }
+      });
+
+      socket.on("ChatMessageFromServer", (msg) => {
+        const chatWindow = document.getElementById("chatWindow");
+        const messageElement = document.createElement("p");
+        messageElement.textContent = msg;
+        chatWindow.appendChild(messageElement);
+      });
+
+      console.log("Connected to the server!");
+    </script>
+  </body>
+</html>
