@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Socket.IO Chat</title>
+    <title>CChat</title>
   </head>
   <body>
-    <h1>Socket.IO CChat</h1>
+    <h1>Chat Here</h1>
     <div>
       <input type="text" name="" id="clientName" placeholder="Enter your ID" />
       <button id="nameSubmitButton">Set ID</button>
@@ -44,8 +44,21 @@
         });
 
       document.getElementById("sendButton").addEventListener("click", () => {
-        const receiver = prompt("enter receiver id");
-        const message = document.getElementById("messageInput").value.trim();
+        // const receiver = prompt("enter receiver id");
+        const messageInput = document
+          .getElementById("messageInput")
+          .value.trim();
+
+        const messageFormat = /^(\d+):\s*(.+)$/;
+        const match = messageInput.match(messageFormat);
+        console.log(match);
+
+        if (!match) {
+          alert("please enter msg in proper format only....");
+          return;
+        }
+        const receiver = match[1];
+        const message = match[2];
         if (receiver && message) {
           const messageToSent = `${clientID}: ${message}`;
           socket.emit("ChatMessage", {
